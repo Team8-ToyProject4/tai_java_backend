@@ -14,3 +14,11 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.team8.tai_backend: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    reactor.netty.http.client: DEBUG

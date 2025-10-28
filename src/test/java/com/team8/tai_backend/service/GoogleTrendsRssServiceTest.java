@@ -2,7 +2,6 @@ package com.team8.tai_backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team8.tai_backend.dto.response.TrendRssResponse;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
