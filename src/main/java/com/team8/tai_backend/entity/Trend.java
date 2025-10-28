@@ -1,13 +1,11 @@
 package com.team8.tai_backend.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,8 +50,8 @@ public class Trend {
     // content
     private String content;
 
-    // reference
-    private List<Reference> references;
+    @OneToMany(mappedBy = "trend", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reference> references = new ArrayList<>(); // reference
 
     // startDate
     private LocalDateTime createdAt;
