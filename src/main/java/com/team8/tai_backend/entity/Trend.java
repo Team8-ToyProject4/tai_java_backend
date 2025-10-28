@@ -3,6 +3,8 @@ package com.team8.tai_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ public class Trend {
     private List<Reference> references = new ArrayList<>(); // reference
 
     // startDate
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @Builder
