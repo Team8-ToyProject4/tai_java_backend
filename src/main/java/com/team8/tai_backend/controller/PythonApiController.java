@@ -29,20 +29,20 @@ public class PythonApiController {
     /**
      * Python 서버로 키워드를 전송하고 LLM 분석 결과를 받습니다
      *
-     * @param request 키워드가 포함된 요청 객체
+     * @param response 키워드가 포함된 요청 객체
      * @return LLM 분석 결과
      */
     @PostMapping("/llm")
-    public Mono<LLMRequest> getTestResponse(@RequestBody TrendRssResponse request) {
+    public Mono<LLMRequest> getTestResponse(@RequestBody TrendRssResponse response) {
 
-        log.debug("테스트 요청 수신 - keyword: {}", request.keyword());
+        log.debug("테스트 요청 수신 - keyword: {}", response.keyword());
 
-        return webClientService.getAiComment()
+        return webClientService.getAiComment(response)
 
-                .doOnSuccess(response -> {
-                    if (response != null) {
-                        log.debug("컨트롤러 응답 성공 - keyword: {}", response.keyword());
-                        log.debug("응답 전체: {}", response);
+                .doOnSuccess(request -> {
+                    if (request != null) {
+                        log.debug("컨트롤러 응답 성공 - keyword: {}", request.keyword());
+                        log.debug("응답 전체: {}", request);
                     }
                 })
 
