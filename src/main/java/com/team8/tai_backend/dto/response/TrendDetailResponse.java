@@ -22,7 +22,7 @@ import java.util.List;
  * @param approx_traffic 대략적인 검색량
  * @param category       트렌드 카테고리
  * @param tags           트렌드와 관련된 태그 목록
- * @param createAt       트렌드 생성 일시 (ISO-8601 형식)
+ * @param createdAt       트렌드 생성 일시 (ISO-8601 형식)
  * @param references     참조 URL 목록
  * @author chan
  * @see Trend
@@ -39,7 +39,7 @@ public record TrendDetailResponse(
         String approx_traffic,
         String category,
         List<String> tags,
-        String createAt,
+        String createdAt,
         List<String> references
 ) {
 
