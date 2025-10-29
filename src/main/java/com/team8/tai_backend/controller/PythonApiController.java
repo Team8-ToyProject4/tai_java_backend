@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/api/test")
 @RestController
-public class TestController {
+public class PythonApiController {
 
     private final WebClientService webClientService;
 
