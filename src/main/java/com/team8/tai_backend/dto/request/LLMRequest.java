@@ -1,5 +1,8 @@
 package com.team8.tai_backend.dto.request;
 
+import com.team8.tai_backend.entity.Reference;
+import com.team8.tai_backend.entity.Trend;
+
 import java.util.List;
 
 /**
@@ -25,4 +28,20 @@ public record LLMRequest(
         String category,
         List<String> refered
 ) {
+
+    public static LLMRequest from(Trend trend) {
+        List<String> referenceUrls = trend.getReferences()
+                .stream()
+                .map(Reference::getUrl)
+                .toList();
+
+        return new LLMRequest(
+                trend.getKeyword(),
+                trend.getDescription(),
+                trend.getContent(),
+                trend.getTags(),
+                trend.getCategory(),
+                referenceUrls
+        );
+    }
 }
