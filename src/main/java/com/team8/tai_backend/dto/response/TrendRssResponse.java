@@ -6,7 +6,9 @@ package com.team8.tai_backend.dto.response;
  * @author daeun
  */
 public record TrendRssResponse(
-        String keyword
+        String keyword,
+        long rank,
+        String approx_traffic
 ) {
 
 }

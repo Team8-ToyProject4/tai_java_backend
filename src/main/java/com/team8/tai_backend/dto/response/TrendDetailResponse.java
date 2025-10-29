@@ -2,6 +2,7 @@ package com.team8.tai_backend.dto.response;
 
 import com.team8.tai_backend.dto.request.LLMRequest;
 import com.team8.tai_backend.entity.Trend;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +23,8 @@ import java.time.format.DateTimeFormatter;
  * @see Trend
  * @since 1.0
  */
+
+@Builder
 public record TrendDetailResponse(
         Long id,
         String region,
@@ -42,16 +45,14 @@ public record TrendDetailResponse(
      */
     public static TrendDetailResponse of(Trend trend) {
 
-        LocalDateTime dateTime = trend.getCreatedAt();
         LLMRequest llmRequest = LLMRequest.from(trend);
 
-        return new TrendDetailResponse(
-                trend.getId(),
-                trend.getRegion(),
-                trend.getRank(),
-                trend.getApprox_traffic(),
-                dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                llmRequest
-        );
+        return TrendDetailResponse.builder()
+                .id(trend.getId())
+                .region(trend.getRegion())
+                .rank(trend.getRank())
+                .approx_traffic(trend.getApprox_traffic())
+                .llmResult(llmRequest)
+                .build();
     }
 }

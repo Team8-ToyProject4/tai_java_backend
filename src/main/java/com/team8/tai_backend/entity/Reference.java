@@ -2,12 +2,8 @@ package com.team8.tai_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.awt.geom.Area;
-import java.util.List;
 
 /**
  * java doc
@@ -29,8 +25,12 @@ public class Reference {
     @JoinColumn(name = "trend_id")
     private Trend trend;
 
-    @Builder
-    public Reference(Trend trend) {
+    private Reference(Trend trend, String url) {
         this.trend = trend;
+        this.url = url;
+    }
+
+    public static Reference of(Trend trend, String url) {
+        return new Reference(trend, url);
     }
 }
