@@ -1,10 +1,15 @@
 package com.team8.tai_backend.entity;
 
 
+
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,8 +20,12 @@ import java.util.List;
  *
  * @author chan
  */
+
+@Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Trend {
 
@@ -44,7 +53,11 @@ public class Trend {
     private String category;
 
     // tags
-    private List<String> tags;
+    @ElementCollection
+    @CollectionTable(name = "trend_tags", joinColumns = @JoinColumn(name = "trend_id"))
+    @Column(name = "tag")
+    @Builder.Default
+    private List<String> tags = new ArrayList<>();
 
     // approx_traffic
     private String approx_traffic;
@@ -52,25 +65,32 @@ public class Trend {
     // content
     private String content;
 
-    @OneToMany(mappedBy = "trend", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reference> references = new ArrayList<>(); // reference
+    @ElementCollection
+    @CollectionTable(name = "trend_references", joinColumns = @JoinColumn(name = "trend_id"))
+    @Column(name = "url")
+    @Builder.Default
+    private List<String> references = new ArrayList<>();
 
     // startDate
     @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @Builder
-    public Trend(String region, Long rank, String keyword, String description, String ai_description, String category, List<String> tags, String approx_traffic, String content, List<Reference> references, LocalDateTime createdAt) {
-        this.region = region;
-        this.rank = rank;
-        this.keyword = keyword;
-        this.description = description;
-        this.ai_description = ai_description;
-        this.category = category;
-        this.tags = tags;
-        this.approx_traffic = approx_traffic;
-        this.content = content;
-        this.references = references;
-        this.createdAt = createdAt;
+    // 기존 태그 목록을 새로운 값으로 교체하며, null이 전달되면 아무 작업도 수행하지 않습니다.
+    public void updateTags(List<String> tags) {
+        this.tags.clear();
+        if (tags == null) {
+            return;
+        }
+        this.tags.addAll(tags);
+    }
+
+    // 참고 링크 목록을 새로 설정하며 null은 무시합니다.
+    public void updateReferences(List<String> urls) {
+        this.references.clear();
+        if (urls == null) {
+            return;
+        }
+        this.references.addAll(urls);
     }
 }
