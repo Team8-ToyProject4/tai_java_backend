@@ -4,6 +4,8 @@ import com.team8.tai_backend.dto.request.LLMRequest;
 import com.team8.tai_backend.entity.Trend;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 /**
  * 트렌드 상세 조회 응답 DTO
  * <p>
@@ -27,7 +29,7 @@ public record TrendDetailResponse(
         String region,
         Long rank,
         String approx_traffic,
-        String createdAt,
+        LocalDateTime createdAt,
         LLMRequest llmResult
 ) {
 
@@ -50,6 +52,7 @@ public record TrendDetailResponse(
                 .rank(trend.getRank())
                 .approx_traffic(trend.getApprox_traffic())
                 .llmResult(llmRequest)
+                .createdAt(trend.getCreatedAt())
                 .build();
     }
 }
