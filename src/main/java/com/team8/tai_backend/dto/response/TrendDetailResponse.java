@@ -4,9 +4,6 @@ import com.team8.tai_backend.dto.request.LLMRequest;
 import com.team8.tai_backend.entity.Trend;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 /**
  * 트렌드 상세 조회 응답 DTO
  * <p>
@@ -38,7 +35,7 @@ public record TrendDetailResponse(
      * Trend 엔티티를 TrendDetailResponse DTO로 변환합니다
      * <p>
      * 엔티티의 생성 시간을 ISO-8601 형식으로 포맷하고,
-     * Reference 엔티티 목록에서 URL만 추출하여 변환합니다.
+     * 저장된 참조 URL 목록을 그대로 응답에 포함합니다.
      *
      * @param trend 변환할 Trend 엔티티
      * @return 변환된 TrendDetailResponse 객체

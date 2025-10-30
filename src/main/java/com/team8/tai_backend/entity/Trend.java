@@ -65,9 +65,11 @@ public class Trend {
     // content
     private String content;
 
-    @OneToMany(mappedBy = "trend", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection
+    @CollectionTable(name = "trend_references", joinColumns = @JoinColumn(name = "trend_id"))
+    @Column(name = "url")
     @Builder.Default
-    private List<Reference> references = new ArrayList<>();
+    private List<String> references = new ArrayList<>();
 
     // startDate
     @CreatedDate
@@ -83,16 +85,12 @@ public class Trend {
         this.tags.addAll(tags);
     }
 
-    // 단일 URL을 Reference 엔티티로 감싸 Trend에 연결합니다.
-    public void addReference(String url) {
-        this.references.add(Reference.of(this, url));
-    }
-
-    // 여러 URL을 순회하며 addReference를 호출해 일괄로 참조를 추가합니다.
-    public void addReferences(List<String> urls) {
+    // 참고 링크 목록을 새로 설정하며 null은 무시합니다.
+    public void updateReferences(List<String> urls) {
+        this.references.clear();
         if (urls == null) {
             return;
         }
-        urls.forEach(this::addReference);
+        this.references.addAll(urls);
     }
 }

@@ -66,7 +66,7 @@ public class TrendService {
                 .build();
 
         trend.updateTags(request.tags());
-        trend.addReferences(request.refered());
+        trend.updateReferences(request.refered());
 
         Trend savedTrend = repository.save(trend);
 
