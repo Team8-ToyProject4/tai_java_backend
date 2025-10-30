@@ -31,7 +31,12 @@ public class Trend {
 
     // id
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(
+            name = "trend_seq_gen",
+            sequenceName = "trend_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trend_seq_gen")
     private Long id;
 
     // region
