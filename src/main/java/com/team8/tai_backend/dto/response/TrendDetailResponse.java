@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
  * @param region         트렌드가 발생한 지역
  * @param rank           트렌드 순위
  * @param approx_traffic 대략적인 검색량
- * @param createAt       트렌드 생성 일시 (ISO-8601 형식)
+ * @param createdAt       트렌드 생성 일시 (ISO-8601 형식)
  * @param llmResult      트렌드 분석 결과 DTO (키워드/본문/설명/태그/카테고리/참조 URL)
  * @author chan
  * @see Trend
@@ -30,7 +30,7 @@ public record TrendDetailResponse(
         String region,
         Long rank,
         String approx_traffic,
-        String createAt,
+        String createdAt,
         LLMRequest llmResult
 ) {
 

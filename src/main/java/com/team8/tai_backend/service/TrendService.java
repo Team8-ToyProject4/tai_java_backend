@@ -3,6 +3,7 @@ package com.team8.tai_backend.service;
 import com.team8.tai_backend.dto.request.LLMRequest;
 import com.team8.tai_backend.dto.response.TrendDetailResponse;
 import com.team8.tai_backend.dto.response.TrendResponse;
+import com.team8.tai_backend.dto.response.TrendRssResponse;
 import com.team8.tai_backend.entity.Trend;
 import com.team8.tai_backend.repository.TrendRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class TrendService {
 
     // repository
     private final TrendRepository repository;
+    private final GoogleTrendsRssService googleTrendsRssService;
 
     // find_all
     public List<TrendResponse> getTrendBoard() {
@@ -43,13 +45,24 @@ public class TrendService {
     @Transactional
     public TrendDetailResponse createTrend(LLMRequest request) {
 
+        TrendRssResponse rssData = googleTrendsRssService.fetchLatestTrends()
+                .stream()
+                .filter(rss -> rss.keyword().equalsIgnoreCase(request.keyword()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("RSS에서 해당 키워드를 찾을 수 없습니다: " + request.keyword()));
+
+        Long rank = rssData.rank();
+        String approxTraffic = rssData.approx_traffic();
+
         Trend trend = Trend.builder()
                 .region("KR")
                 .keyword(request.keyword())
+                .rank(rank)
                 .description(request.description())
                 .ai_description(request.description())
                 .category(request.category())
                 .content(request.content())
+                .approx_traffic(approxTraffic)
                 .build();
 
         trend.updateTags(request.tags());
