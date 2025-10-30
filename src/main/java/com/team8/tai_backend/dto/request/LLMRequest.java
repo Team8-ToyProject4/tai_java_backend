@@ -39,4 +39,16 @@ public record LLMRequest(
                 trend.getReferences()
         );
     }
+
+  @Override
+  public String toString() {
+    return "LLMRequest{" +
+            "keyword='" + keyword + '\'' +
+            ", description='" + description + '\'' +
+            ", content='" + content + '\'' +
+            ", tags=" + tags +
+            ", category='" + category + '\'' +
+            ", refered=" + refered +
+            '}';
+  }
 }
