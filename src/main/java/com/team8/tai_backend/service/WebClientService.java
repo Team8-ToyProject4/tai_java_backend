@@ -32,19 +32,18 @@ public class WebClientService {
      * 지정된 키워드를 Python 서버의 /api/request 엔드포인트로 전송하여
      * LLM이 생성한 요약, 태그, 카테고리 등의 분석 결과를 비동기로 수신합니다.
      *
+     * @param response 트렌드 키워드
      * @return LLM 분석 결과를 담은 Mono 객체
      * @throws org.springframework.web.reactive.function.client.WebClientResponseException HTTP 요청 실패 시 (4xx, 5xx 에러)
      * @throws org.springframework.web.reactive.function.client.WebClientRequestException  네트워크 연결 실패 시
      */
-    public Mono<LLMRequest> getAiComment() {
+    public Mono<LLMRequest> getAiComment(TrendRssResponse response) {
 
         log.debug("==== LLM에 응답 요청 시작 ====");
 
-        TrendRssResponse request = new TrendRssResponse("예시 키워드");
-
         return webClient.post()
                 .uri("/request")
-                .bodyValue(request)
+                .bodyValue(response)
                 .retrieve()
                 .bodyToMono(LLMRequest.class);
     }
