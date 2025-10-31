@@ -29,7 +29,7 @@ public class RestClientService {
             .body(request)
             .retrieve()
             .body(LLMRequest.class);
-    System.out.print(result);
+    System.out.print("요청 완료: " + result.keyword() + "\n");
     return result;
   }
 
