@@ -15,7 +15,7 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-      hibernate.id.optimizer.pooled.preferred: none
+      hibernate.id.optimizer.pooled.preferred: false
 
 # 로깅 설정
 logging:
