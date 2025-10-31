@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -27,8 +30,11 @@ public class TrendService {
 
     // find_all
     public List<TrendResponse> getTrendBoard() {
+        LocalDate targetDate = LocalDate.of(2025, 10, 31);
+        LocalDateTime startOfDay = targetDate.atStartOfDay();
+        LocalDateTime endOfDay = targetDate.atTime(LocalTime.MAX);
 
-        return repository.findAll().stream()
+        return repository.findAllByCreatedAtBetween(startOfDay, endOfDay).stream()
                 .map(TrendResponse::of)
                 .toList();
     }
