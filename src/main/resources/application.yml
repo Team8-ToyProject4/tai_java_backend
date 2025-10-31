@@ -14,9 +14,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-  threads:
-    virtual:
-      enabled: true
 
 # 로깅 설정
 logging:
