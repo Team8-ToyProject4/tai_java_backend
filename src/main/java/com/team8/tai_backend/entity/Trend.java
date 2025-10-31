@@ -49,9 +49,11 @@ public class Trend {
     private String keyword;
 
     // description (한줄평)
+    @Column(length = 2000)
     private String description;
 
     // ai_summarize (요약)
+    @Column(length = 2000)
     private String ai_description;
 
     // category
@@ -68,6 +70,7 @@ public class Trend {
     private String approx_traffic;
 
     // content
+    @Column(length = 2000)
     private String content;
 
     @ElementCollection
