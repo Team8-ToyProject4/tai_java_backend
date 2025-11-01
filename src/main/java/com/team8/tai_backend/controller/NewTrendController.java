@@ -13,8 +13,9 @@ import java.util.List;
 public class NewTrendController {
   private final NewTrendService newTrendService;
 
-  @GetMapping("/entire/test")
-  public List<TrendDetailResponse> testController() {
-    return newTrendService.run();
-  }
+  // 테스트용 엔드포인터였습니다. 주석처리합니다.
+//  @GetMapping("/entire/test")
+//  public List<TrendDetailResponse> testController() {
+//    return newTrendService.run();
+//  }
 }

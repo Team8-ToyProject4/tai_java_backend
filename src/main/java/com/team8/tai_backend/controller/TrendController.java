@@ -41,11 +41,12 @@ public class TrendController {
         return trendService.getTrendDetail(id);
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public TrendDetailResponse createTrend(@RequestBody @Valid LLMRequest request) {
-
-        return trendService.createTrend(request);
-    }
+    // 불필요하며 취약점이 될 수 있는 가능성이 있습니다. 주석 처리 합니다.
+//    @PostMapping
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public TrendDetailResponse createTrend(@RequestBody @Valid LLMRequest request) {
+//
+//        return trendService.createTrend(request);
+//    }
 
 }

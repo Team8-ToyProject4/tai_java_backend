@@ -4,6 +4,7 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.util.TimeValue;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -16,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class RestClientConfig {
+  @Value("${python-url}")
+  private String baseUrl;
 
   @Bean
   public RestClient restClient() {
@@ -33,7 +36,7 @@ public class RestClientConfig {
     var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
     return RestClient.builder()
-            .baseUrl("http://localhost:8000")
+            .baseUrl(baseUrl)
             .requestFactory(factory)
             .build();
   }

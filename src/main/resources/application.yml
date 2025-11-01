@@ -16,7 +16,6 @@ spring:
       ddl-auto: update
     properties:
       hibernate.id.optimizer.pooled.preferred: false
-
 # 로깅 설정
 logging:
   level:
@@ -24,3 +23,6 @@ logging:
     com.team8.tai_backend: DEBUG
     org.springframework.web.reactive.function.client: DEBUG
     reactor.netty.http.client: DEBUG
+
+python-url: ${PYTHON_URL}
+front-url: ${FRONT_URL}
