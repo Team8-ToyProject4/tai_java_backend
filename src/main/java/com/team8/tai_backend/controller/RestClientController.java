@@ -19,13 +19,14 @@ public class RestClientController {
   private final RestClient restClient;
   private final RestClientService restService;
 
-  @PostMapping("/rest/one")
-  public LLMRequest fetchOne(@RequestBody TrendRssRequest request) {
-    return restService.fetchOne(request);
-  }
-
-  @PostMapping("/rest/all")
-  public List<LLMRequest> fetchAll(@RequestBody List<TrendRssRequest> request) {
-    return restService.fetchAll(request);
-  }
+  // 테스트용 엔드포인트였기에 주석처리합니다.
+//  @PostMapping("/rest/one")
+//  public LLMRequest fetchOne(@RequestBody TrendRssRequest request) {
+//    return restService.fetchOne(request);
+//  }
+//
+//  @PostMapping("/rest/all")
+//  public List<LLMRequest> fetchAll(@RequestBody List<TrendRssRequest> request) {
+//    return restService.fetchAll(request);
+//  }
 }
