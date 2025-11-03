@@ -1,0 +1,90 @@
+name: Docker Image CI/CD
+
+# main 브랜치에 push하면 도커 이미지를 빌드하고 GHCR에 업로드
+# PR 생성 시에는 빌드 테스트만 수행
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read      # 코드 읽기 권한
+      packages: write     # GHCR에 이미지 업로드 권한
+
+    steps:
+    # 1단계: Git 저장소 코드 체크아웃
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2단계: GitHub Container Registry 로그인 (PR은 건너뜀)
+    # GitHub이 자동으로 제공하는 GITHUB_TOKEN 사용
+    - name: Log in to GitHub Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # 3단계: 도커 이미지 태그 및 메타데이터 생성
+    # 예시: latest, main, main-abc1234 (커밋 SHA)
+    - name: Extract metadata (tags, labels)
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=ref,event=branch
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    # 4단계: 도커 이미지 빌드 및 푸시
+    # PR일 때는 빌드만, main 푸시일 때는 빌드 + GHCR 업로드
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./Dockerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    # 5단계: 업로드된 이미지 출력 (로그용)
+    - name: Image digest
+      if: github.event_name != 'pull_request'
+      run: echo "Image pushed with digest ${{ steps.build-and-push.outputs.digest }}"
+
+  # 서버 자동 배포 Job (main 브랜치 푸시 시에만 실행)
+  deploy:
+    needs: build-and-push  # 이미지 빌드 성공 후 실행
+    if: github.event_name != 'pull_request'  # PR은 배포 안함
+    runs-on: ubuntu-latest
+
+    steps:
+    # SSH로 서버 접속하여 배포 명령 실행
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}          # GitHub Secrets에 설정 필요
+        username: ${{ secrets.SERVER_USER }}      # GitHub Secrets에 설정 필요
+        key: ${{ secrets.SERVER_SSH_KEY }}        # GitHub Secrets에 설정 필요
+        port: 22                                   # SSH 포트 (기본값 22, 다르면 수정)
+        script: |
+          # 프로젝트 디렉토리로 이동 (GitHub Secrets에 경로 설정 또는 직접 입력)
+          cd ${{ secrets.SERVER_PROJECT_PATH }}
+
+          # GHCR 로그인 (서버에서 이미지를 pull하기 위해)
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          # 최신 이미지 다운로드
+          docker compose pull
+
+          # 컨테이너 재시작 (다운타임 최소화)
+          docker compose up -d
+
+          # 사용하지 않는 이미지 정리 (선택사항)
+          docker image prune -af
