@@ -26,30 +26,31 @@ public class PythonApiController {
 
     private final WebClientService webClientService;
 
+    // WebClient가 아닌 RestClient를 사용하기로 했습니다. 주석처리합니다.
     /**
      * Python 서버로 키워드를 전송하고 LLM 분석 결과를 받습니다
      *
      * @param response 키워드가 포함된 요청 객체
      * @return LLM 분석 결과
      */
-    @PostMapping("/llm")
-    public Mono<LLMRequest> getTestResponse(@RequestBody TrendRssResponse response) {
-
-        log.debug("테스트 요청 수신 - keyword: {}", response.keyword());
-
-        return webClientService.getAiComment(response)
-
-                .doOnSuccess(request -> {
-                    if (request != null) {
-                        log.debug("컨트롤러 응답 성공 - keyword: {}", request.keyword());
-                        log.debug("응답 전체: {}", request);
-                    }
-                })
-
-                .doOnError(error -> {
-                    log.error("컨트롤러 에러 발생: {}", error.getMessage());
-                });
-    }
+//    @PostMapping("/llm")
+//    public Mono<LLMRequest> getTestResponse(@RequestBody TrendRssResponse response) {
+//
+//        log.debug("테스트 요청 수신 - keyword: {}", response.keyword());
+//
+//        return webClientService.getAiComment(response)
+//
+//                .doOnSuccess(request -> {
+//                    if (request != null) {
+//                        log.debug("컨트롤러 응답 성공 - keyword: {}", request.keyword());
+//                        log.debug("응답 전체: {}", request);
+//                    }
+//                })
+//
+//                .doOnError(error -> {
+//                    log.error("컨트롤러 에러 발생: {}", error.getMessage());
+//                });
+//    }
 
     /**
      * 헬스 체크 엔드포인트

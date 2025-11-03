@@ -2,6 +2,7 @@ package com.team8.tai_backend._core.config;
 
 import com.team8.tai_backend.service.NewTrendService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -17,9 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @RequiredArgsConstructor
 @Configuration
 public class SchedularConfig {
-
     private final NewTrendService trendService;
-
     /**
      * 주기적으로 트렌드 데이터 수집 작업을 실행합니다.
      * 테스트 환경에서는 5분마다 실행되도록 설정되어 있습니다.
