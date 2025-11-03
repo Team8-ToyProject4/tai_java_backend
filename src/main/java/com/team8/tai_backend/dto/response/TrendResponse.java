@@ -2,6 +2,7 @@ package com.team8.tai_backend.dto.response;
 
 import com.team8.tai_backend.entity.Trend;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,7 +31,8 @@ public record TrendResponse(
         String description,
         String approx_traffic,
         String category,
-        List<String> tags
+        List<String> tags,
+        LocalDateTime createdAt
 ) {
 
     /**
@@ -48,7 +50,8 @@ public record TrendResponse(
                 trend.getDescription(),
                 trend.getApprox_traffic(),
                 trend.getCategory(),
-                trend.getTags()
+                trend.getTags(),
+                trend.getCreatedAt()
         );
     }
 }
