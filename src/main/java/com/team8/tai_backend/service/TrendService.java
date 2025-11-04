@@ -1,18 +1,13 @@
 package com.team8.tai_backend.service;
 
-import com.team8.tai_backend.dto.request.LLMRequest;
 import com.team8.tai_backend.dto.response.TrendDetailResponse;
 import com.team8.tai_backend.dto.response.TrendResponse;
-import com.team8.tai_backend.dto.response.TrendRssResponse;
 import com.team8.tai_backend.entity.Trend;
 import com.team8.tai_backend.repository.TrendRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -26,16 +21,13 @@ public class TrendService {
 
     // repository
     private final TrendRepository repository;
-    private final GoogleTrendsRssService googleTrendsRssService;
 
     // find_all
-    public List<TrendResponse> getTrendBoard() {
-//        LocalDate targetDate = LocalDate.of(2025, 10, 31); // 아마 테스트용이었겠죠?? 주석 처리 하겠습니다.
-        LocalDate targetDate = LocalDate.now();
-        LocalDateTime startOfDay = targetDate.atStartOfDay();
-        LocalDateTime endOfDay = targetDate.atTime(LocalTime.MAX);
+    public List<TrendResponse> getTrendBoard(LocalDateTime targetDateTime) {
 
-        return repository.findAllByCreatedAtBetween(startOfDay, endOfDay).stream()
+        LocalDateTime endOfDay = targetDateTime.plusHours(1);
+
+        return repository.findAllByCreatedAtBetween(targetDateTime, endOfDay).stream()
                 .map(TrendResponse::of)
                 .toList();
     }
