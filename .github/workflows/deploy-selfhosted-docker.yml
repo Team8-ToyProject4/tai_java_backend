@@ -14,15 +14,15 @@ jobs:
     runs-on: self-hosted  # 서버에 설치된 runner에서 실행
 
     steps:
+    # 1단계: 코드 체크아웃
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Load .env
       run: |
         cat << 'EOF' > .env
         ${{ secrets.JAVA_ENV_FILE }}
         EOF
-
-    # 1단계: 코드 체크아웃
-    - name: Checkout code
-      uses: actions/checkout@v4
 
     # 2단계: Java 환경 설정
     - name: Set up JDK 21
