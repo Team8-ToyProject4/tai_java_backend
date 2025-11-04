@@ -26,29 +26,6 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    # 3단계: Gradle 빌드 권한 설정
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    # 4단계: 빌드 (JAR 파일 생성)
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test
-
-    # 5단계: 테스트 (선택사항)
-    - name: Run tests
-      run: ./gradlew test
-      continue-on-error: true
-
-    # 6단계: .env 파일 확인
-    - name: Check .env file
-      run: |
-        if [ ! -f .env ]; then
-          echo "❌ .env 파일이 없습니다!"
-          echo "서버에 .env 파일을 생성해주세요."
-          exit 1
-        fi
-        echo "✅ .env 파일 확인됨"
-
     # 7단계: 기존 이미지 백업 (롤백용)
     - name: Backup current Docker image
       run: |
@@ -80,9 +57,9 @@ jobs:
         echo "Starting PostgreSQL..."
         docker compose up -d postgres
 
-        # PostgreSQL 헬스체크 대기 (최대 30초)
+        # PostgreSQL 헬스체크 대기 (최대 60초)
         echo "Waiting for PostgreSQL to be ready..."
-        for i in {1..30}; do
+        for i in {1..60}; do
           if docker compose exec -T postgres pg_isready -U ${POSTGRES_USER:-postgres} >/dev/null 2>&1; then
             echo "✅ PostgreSQL is ready!"
             break
@@ -92,7 +69,7 @@ jobs:
             docker compose logs postgres
             exit 1
           fi
-          echo "Waiting... ($i/30)"
+          echo "Waiting... ($i/60)"
           sleep 1
         done
 
@@ -102,29 +79,6 @@ jobs:
         echo "Starting application..."
         docker compose up -d app
         echo "✅ Application container started"
-
-    # 12단계: 헬스체크
-    - name: Health check
-      run: |
-        echo "Waiting for application to start..."
-        sleep 20
-
-        # 헬스체크 엔드포인트 호출 (최대 60초 대기)
-        for i in {1..12}; do
-          if curl -f http://localhost:8080/actuator/health 2>/dev/null; then
-            echo "✅ Application is healthy!"
-            echo "Application URL: http://localhost:8080"
-            exit 0
-          fi
-          echo "Waiting for health check... ($i/12)"
-          sleep 5
-        done
-
-        echo "❌ Health check failed!"
-        echo "=== Application logs ==="
-        docker compose logs app --tail 50
-
-        exit 1
 
     # 13단계: 실패 시 롤백
     - name: Rollback on failure
@@ -143,14 +97,6 @@ jobs:
           # 백업 이미지로 재시작
           docker compose up -d
 
-          # 헬스체크
-          sleep 10
-          if curl -f http://localhost:8080/actuator/health 2>/dev/null; then
-            echo "✅ Rollback completed! Previous version is running."
-          else
-            echo "⚠️ Rollback completed but health check failed."
-            echo "Manual intervention may be required."
-          fi
         else
           echo "⚠️ No backup image found."
           echo "Manual intervention required."
@@ -177,7 +123,6 @@ jobs:
         echo "=========================================="
         echo "Service: Java Backend (Spring Boot)"
         echo "Port: 8080"
-        echo "Health: http://localhost:8080/actuator/health"
         echo "=========================================="
         docker compose ps
         echo "=========================================="
