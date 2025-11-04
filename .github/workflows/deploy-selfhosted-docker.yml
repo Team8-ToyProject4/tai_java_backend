@@ -18,6 +18,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Load .env
+      run: |
+        cat << 'EOF' > .env
+        ${{ secrets.JAVA_ENV_FILE }}
+        EOF
+
     # 2단계: Java 환경 설정
     - name: Set up JDK 21
       uses: actions/setup-java@v4
