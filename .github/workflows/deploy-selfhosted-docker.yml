@@ -1,0 +1,183 @@
+name: Deploy (Self-hosted + Docker)
+
+# 혼합 방식: Self-hosted Runner + Docker
+# - Self-hosted Runner: SSH 접속 불필요 (서버가 GitHub에 접속)
+# - Docker: 환경 격리, 빠른 배포, 쉬운 롤백
+# - 로컬 빌드: GHCR 업로드/다운로드 없이 서버에서 직접 빌드
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  # 서버에 설치된 runner에서 실행
+
+    steps:
+    # 1단계: 코드 체크아웃
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2단계: Java 환경 설정
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    # 3단계: Gradle 빌드 권한 설정
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # 4단계: 빌드 (JAR 파일 생성)
+    - name: Build with Gradle
+      run: ./gradlew clean build -x test
+
+    # 5단계: 테스트 (선택사항)
+    - name: Run tests
+      run: ./gradlew test
+      continue-on-error: true
+
+    # 6단계: .env 파일 확인
+    - name: Check .env file
+      run: |
+        if [ ! -f .env ]; then
+          echo "❌ .env 파일이 없습니다!"
+          echo "서버에 .env 파일을 생성해주세요."
+          exit 1
+        fi
+        echo "✅ .env 파일 확인됨"
+
+    # 7단계: 기존 이미지 백업 (롤백용)
+    - name: Backup current Docker image
+      run: |
+        if docker image inspect tai_java_backend:latest >/dev/null 2>&1; then
+          echo "Backing up current image..."
+          docker tag tai_java_backend:latest tai_java_backend:backup 2>/dev/null || true
+          echo "✅ Backup created"
+        else
+          echo "No existing image to backup"
+        fi
+
+    # 8단계: Docker 이미지 빌드
+    - name: Build Docker image
+      run: |
+        echo "Building Docker image..."
+        docker build -t tai_java_backend:latest .
+        echo "✅ Docker image built successfully"
+
+    # 9단계: 기존 컨테이너 중지
+    - name: Stop existing containers
+      run: |
+        echo "Stopping existing containers..."
+        docker compose down || true
+        echo "✅ Containers stopped"
+
+    # 10단계: PostgreSQL 시작 및 헬스체크
+    - name: Start PostgreSQL
+      run: |
+        echo "Starting PostgreSQL..."
+        docker compose up -d postgres
+
+        # PostgreSQL 헬스체크 대기 (최대 30초)
+        echo "Waiting for PostgreSQL to be ready..."
+        for i in {1..30}; do
+          if docker compose exec -T postgres pg_isready -U ${POSTGRES_USER:-postgres} >/dev/null 2>&1; then
+            echo "✅ PostgreSQL is ready!"
+            break
+          fi
+          if [ $i -eq 30 ]; then
+            echo "❌ PostgreSQL failed to start!"
+            docker compose logs postgres
+            exit 1
+          fi
+          echo "Waiting... ($i/30)"
+          sleep 1
+        done
+
+    # 11단계: 애플리케이션 시작
+    - name: Start application
+      run: |
+        echo "Starting application..."
+        docker compose up -d app
+        echo "✅ Application container started"
+
+    # 12단계: 헬스체크
+    - name: Health check
+      run: |
+        echo "Waiting for application to start..."
+        sleep 20
+
+        # 헬스체크 엔드포인트 호출 (최대 60초 대기)
+        for i in {1..12}; do
+          if curl -f http://localhost:8080/actuator/health 2>/dev/null; then
+            echo "✅ Application is healthy!"
+            echo "Application URL: http://localhost:8080"
+            exit 0
+          fi
+          echo "Waiting for health check... ($i/12)"
+          sleep 5
+        done
+
+        echo "❌ Health check failed!"
+        echo "=== Application logs ==="
+        docker compose logs app --tail 50
+
+        exit 1
+
+    # 13단계: 실패 시 롤백
+    - name: Rollback on failure
+      if: failure()
+      run: |
+        echo "⚠️ Deployment failed! Rolling back..."
+
+        # 실패한 컨테이너 중지
+        docker compose down || true
+
+        # 백업 이미지가 있으면 복구
+        if docker image inspect tai_java_backend:backup >/dev/null 2>&1; then
+          echo "Restoring backup image..."
+          docker tag tai_java_backend:backup tai_java_backend:latest
+
+          # 백업 이미지로 재시작
+          docker compose up -d
+
+          # 헬스체크
+          sleep 10
+          if curl -f http://localhost:8080/actuator/health 2>/dev/null; then
+            echo "✅ Rollback completed! Previous version is running."
+          else
+            echo "⚠️ Rollback completed but health check failed."
+            echo "Manual intervention may be required."
+          fi
+        else
+          echo "⚠️ No backup image found."
+          echo "Manual intervention required."
+        fi
+
+    # 14단계: 정리 (성공 시)
+    - name: Clean up old images
+      if: success()
+      run: |
+        # 백업 이미지 정리
+        docker image rm tai_java_backend:backup 2>/dev/null || true
+
+        # dangling 이미지 정리
+        docker image prune -f --filter "dangling=true" || true
+
+        echo "✅ Cleanup completed!"
+
+    # 15단계: 배포 완료 알림
+    - name: Deployment summary
+      if: success()
+      run: |
+        echo "=========================================="
+        echo "🎉 Deployment Successful!"
+        echo "=========================================="
+        echo "Service: Java Backend (Spring Boot)"
+        echo "Port: 8080"
+        echo "Health: http://localhost:8080/actuator/health"
+        echo "=========================================="
+        docker compose ps
+        echo "=========================================="
