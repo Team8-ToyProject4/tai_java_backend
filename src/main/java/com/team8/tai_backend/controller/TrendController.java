@@ -1,6 +1,5 @@
 package com.team8.tai_backend.controller;
 
-import com.team8.tai_backend.dto.request.LLMRequest;
 import com.team8.tai_backend.dto.response.TrendDetailResponse;
 import com.team8.tai_backend.dto.response.TrendResponse;
 import com.team8.tai_backend.service.TrendService;
@@ -8,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,9 +28,9 @@ public class TrendController {
     // trendList
     // 트렌드 목록 보여주기 (메인 화면)
     @GetMapping
-    public List<TrendResponse> getTrendBoard() {
+    public List<TrendResponse> getTrendBoard(LocalDateTime targetDate) {
 
-        return trendService.getTrendBoard();
+        return trendService.getTrendBoard(targetDate);
     }
 
     // trend detail
