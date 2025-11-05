@@ -22,7 +22,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .addServersItem(new Server().url("https://taijava.misajd.dev").description("Generated server url"))
-                .addServersItem(new Server().url("http://localhost").description("local server url"))
+                .addServersItem(new Server().url("http://localhost:8080").description("local server url"))
                 .info(new Info()
                         .title("Book Everywhere API")
                         .version("v1")
