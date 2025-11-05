@@ -1,5 +1,6 @@
 package com.team8.tai_backend._core.config;
 
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -20,6 +21,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+                .addServersItem(new Server().url("https://taijava.misajd.dev").description("Generated server url"))
+                .addServersItem(new Server().url("http://localhost:8080").description("local server url"))
                 .info(new Info()
                         .title("Book Everywhere API")
                         .version("v1")
