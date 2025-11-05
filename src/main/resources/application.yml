@@ -26,3 +26,4 @@ logging:
 
 python-url: ${PYTHON_URL}
 front-url: ${FRONT_URL}
+request-pw: ${REQUEST_PASSWORD}

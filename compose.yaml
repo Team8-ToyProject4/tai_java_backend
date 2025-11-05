@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: tai_java_backend:latest  # 로컬: 빌드 후 이미지 저장 / 서버: 미리 빌드된 이미지 사용
     container_name: spring-boot-app
     ports:
       - "${APP_PORT}:8080"
@@ -11,6 +12,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    restart: unless-stopped
 #    networks:
 #      - app-network
 
@@ -28,6 +30,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 #    networks:
 #      - app-network
 
